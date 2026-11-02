@@ -5,21 +5,46 @@ on:
     branches: [main]
   pull_request:
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    name: Deploy to Cloudflare Pages
+    timeout-minutes: 10
     permissions:
       contents: read
       deployments: write
-    name: Deploy to Cloudflare Pages
+    env:
+      PROJECT_NAME: broad-fire-0f77
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v4
 
-      - name: Deploy to Cloudflare Pages
-        uses: cloudflare/wrangler-action@v4
+      - name: Stage site files
+        # Publish only site files, never .git, .github, package.json or .env
+        run: |
+          mkdir -p _site
+          rsync -a \
+            --exclude='_site' --exclude='.git' --exclude='.github' \
+            --exclude='node_modules' --exclude='package*.json' \
+            --exclude='.env*' \
+            ./ _site/
+
+      - name: Ensure Pages project exists
+        uses: cloudflare/wrangler-action@v3
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          command: pages deploy . --project-name=broad-fire-0f77
+          command: pages project create ${{ env.PROJECT_NAME }} --production-branch=main
+        continue-on-error: true
+
+      - name: Deploy to Cloudflare Pages
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           gitHubToken: ${{ secrets.GITHUB_TOKEN }}
+          command: pages deploy _site --project-name=${{ env.PROJECT_NAME }} --branch=${{ github.head_ref || github.ref_name }} --commit-hash=${{ github.sha }}
