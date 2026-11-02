@@ -69,7 +69,7 @@ jobs:
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           command: >-
             pages deploy _site
-            --project-name=${{ vars.CF_PAGES_PROJECT }}
+            --project-name=${{ secrets.CF_PAGES_PROJECT }}
             --branch=${{ github.head_ref || github.ref_name }}
             --commit-hash=${{ github.sha }}
 
