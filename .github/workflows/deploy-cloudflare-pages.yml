@@ -1,25 +1,86 @@
-name: Deploy to Cloudflare Pages
+name: CI/CD - Cloudflare Pages
 
 on:
   push:
-  workflow_dispatch:
-
-permissions:
-  contents: read
+    branches: [main]
+  pull_request:
+    branches: [main]
 
 concurrency:
-  group: cloudflare-pages-${{ github.ref }}
+  group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
+
+env:
+  # Folder containing index.html. Use "." if it's in the repo root,
+  # or "public" / "src" if your site lives in a subfolder.
+  SITE_DIR: .
 
 jobs:
   deploy:
+    name: Check and Deploy
     runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      deployments: write
+      pull-requests: write
     steps:
-      - name: Check out source
+      - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Setup Node
+        if: hashFiles('package.json') != ''
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        if: hashFiles('package-lock.json') != ''
+        run: npm ci
+
+      - name: Lint
+        if: hashFiles('package.json') != ''
+        run: npm run lint --if-present
+
+      - name: Test
+        if: hashFiles('package.json') != ''
+        run: npm test --if-present
+
+      - name: Verify entry point exists
+        run: test -f "$SITE_DIR/index.html" || (echo "index.html not found in $SITE_DIR" && exit 1)
+
+      - name: Stage files for upload
+        # Copies only the site, so package.json, .git, .github, node_modules
+        # and other repo files never get published.
+        run: |
+          mkdir -p _site
+          rsync -a \
+            --exclude='_site' --exclude='.git' --exclude='.github' \
+            --exclude='node_modules' --exclude='package*.json' \
+            --exclude='.env*' --exclude='*.md' \
+            "$SITE_DIR"/ _site/
+
       - name: Deploy to Cloudflare Pages
-        run: npx --yes wrangler@3 pages deploy . --project-name=blue-bonus-aa3d --branch="$GITHUB_REF_NAME"
-        env:
-          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        id: deploy
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: >-
+            pages deploy _site
+            --project-name=${{ vars.CF_PAGES_PROJECT }}
+            --branch=${{ github.head_ref || github.ref_name }}
+            --commit-hash=${{ github.sha }}
+
+      - name: Comment preview URL on PR
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: `Preview deployed: ${{ steps.deploy.outputs.deployment-url }}`
+            })
