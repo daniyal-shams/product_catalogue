@@ -1,0 +1,22 @@
+{
+  "name": "Essential Cotton Chino",
+  "color": "Stone",
+  "colorHex": "#96938b",
+  "headingLead": "Ease,",
+  "headingAccent": "with intention.",
+  "intro": "Tailored where it matters. Uncomplicated everywhere else.",
+  "price": "₹ 3,290",
+  "description": "An easy mid-rise and a clean, tapered leg. Cut from soft stretch cotton that keeps its shape and moves with you, wherever the day leads.",
+  "image": "../../images/catalog/77.png",
+  "imageAlt": "AURA cotton chino in Stone",
+  "imageFit": "contain",
+  "sizes": ["28", "30", "32", "34", "36"],
+  "selectedSize": "32",
+  "details": ["98% cotton / 2% elastane", "240 GSM midweight twill", "Relaxed taper / mid rise", "Reinforced stress points"],
+  "care": ["Cold wash", "No bleach", "Line dry", "Low iron"],
+  "specs": [
+    { "icon": "fa-leaf", "label": "THE FABRIC", "value": "Stretch cotton", "note": "Soft, breathable twill" },
+    { "icon": "fa-weight-hanging", "label": "THE WEIGHT", "value": "240 GSM", "note": "Made for every season" },
+    { "icon": "fa-person-walking", "label": "THE FIT", "value": "Relaxed taper", "note": "Easy through the day" }
+  ]
+}

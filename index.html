@@ -40,17 +40,16 @@
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body class="antialiased">
-    <!-- ORGANISM: fixed navigation -->
     <header class="site-header" id="site-header">
       <a class="brand-lockup" href="#slide-1" aria-label="AURA home">
         <span class="brand-name">AURA</span>
         <span class="edition-badge">EDITION 01</span>
       </a>
       <nav class="main-nav" aria-label="Main navigation">
-        <a class="nav-link active" href="#slide-1">The edit</a>
-        <a class="nav-link" href="#slide-2">The shirt</a>
-        <a class="nav-link" href="#slide-3">The chino</a>
-        <a class="nav-link" href="#slide-4">Visit us</a>
+        <a class="nav-link active" href="#slide-1" data-nav="home">The edit</a>
+        <a class="nav-link" href="#slide-2" data-nav="shirt">The shirt</a>
+        <a class="nav-link" href="#slide-3" data-nav="pant">The pant</a>
+        <a class="nav-link" href="#slide-4" data-nav="visit">Visit us</a>
       </nav>
       <a
         class="header-cta"
@@ -67,17 +66,9 @@
       </button>
     </header>
 
-    <!-- ATOM: desktop slide indicators -->
-    <nav class="slide-indicators" aria-label="Slide navigation">
-      <a href="#slide-1" class="indicator active" aria-label="Go to The edit"></a>
-      <a href="#slide-2" class="indicator" aria-label="Go to The shirt"></a>
-      <a href="#slide-3" class="indicator" aria-label="Go to The chino"></a>
-      <a href="#slide-4" class="indicator" aria-label="Go to Visit us"></a>
-    </nav>
+    <nav class="slide-indicators" id="slide-indicators" aria-label="Slide navigation"></nav>
 
-    <!-- TEMPLATE: full-height, vertically snapping presentation -->
     <main class="deck" id="deck">
-      <!-- ORGANISM: hero -->
       <section class="slide hero-slide" id="slide-1" aria-labelledby="hero-title">
         <div class="hero-grain" aria-hidden="true"></div>
         <div class="hero-content">
@@ -100,10 +91,10 @@
             </a>
             <a class="hero-card chino-card" href="#slide-3">
               <img
-                src="https://images.unsplash.com/photo-1624378439575-d8705ad7ae80?auto=format&fit=crop&w=950&q=85"
-                alt="AURA's tailored essential chino"
+                src="images/home%20slide/WhatsApp%20Image%202026-11-03%20at%208.29.59%20PM.jpeg"
+                alt="AURA's tailored essential pant"
               />
-              <span class="card-index">02 / THE CHINO</span>
+              <span class="card-index">02 / THE PANT</span>
               <span class="card-title">Made for<br />the in-between.</span>
               <span class="card-arrow" aria-hidden="true">↗</span>
             </a>
@@ -112,170 +103,13 @@
         <a class="scroll-cue" href="#slide-2" aria-label="Scroll to the shirt">
           <span>SCROLL TO DISCOVER</span><i class="fa-solid fa-arrow-down" aria-hidden="true"></i>
         </a>
-        <span class="hero-side-note">A STUDY IN SIMPLICITY&nbsp; · &nbsp;01—04</span>
+        <span class="hero-side-note" id="hero-side-note">A STUDY IN SIMPLICITY</span>
       </section>
 
-      <!-- ORGANISM: shirt showcase -->
-      <section class="slide shirt-slide" id="slide-2" aria-labelledby="shirt-title">
-        <div class="section-heading">
-          <div>
-            <span class="eyebrow"><span class="eyebrow-line"></span> 01 / THE SHIRT</span>
-            <h2 class="section-title" id="shirt-title">An icon, <em>reconsidered.</em></h2>
-          </div>
-          <p class="section-intro">The one you reach for. Reimagined in a lighter hand and sixteen considered shades.</p>
-        </div>
-        <div class="shirt-layout">
-          <div class="shirt-visual">
-            <!-- MOLECULE: image frame with selected-shade badge and caption -->
-            <div class="image-frame shirt-frame">
-              <img
-                class="shirt-image shirt-image-front"
-                id="shirt-image-front"
-                src="https://images.unsplash.com/photo-1598033129183-c4f50c736f10?auto=format&fit=crop&w=1300&q=90"
-                alt="AURA essential shirt in Ink"
-              />
-              <img
-                class="shirt-image shirt-image-back"
-                id="shirt-image-back"
-                src="https://images.unsplash.com/photo-1598033129183-c4f50c736f10?auto=format&fit=crop&w=1300&q=90"
-                alt=""
-                aria-hidden="true"
-              />
-              <div class="image-vignette" aria-hidden="true"></div>
-              <div class="shade-tag">
-                <span class="shade-dot" id="shade-dot"></span>
-                <span><small>SELECTED SHADE</small><strong id="shade-name">Ink</strong></span>
-              </div>
-              <span class="frame-caption">AURA / ESSENTIAL SHIRT / SS25</span>
-            </div>
-            <!-- MOLECULE: three reusable garment specification cards -->
-            <div class="spec-row" aria-label="Shirt specifications">
-              <article class="spec-card">
-                <span class="spec-icon"><i class="fa-solid fa-feather-pointed" aria-hidden="true"></i></span>
-                <span class="spec-label">THE FABRIC</span>
-                <strong>Supima cotton</strong>
-                <span>Long-staple · breathable</span>
-              </article>
-              <article class="spec-card">
-                <span class="spec-icon"><i class="fa-solid fa-weight-hanging" aria-hidden="true"></i></span>
-                <span class="spec-label">THE WEIGHT</span>
-                <strong>180 <small>GSM</small></strong>
-                <span>Lightweight, lasting form</span>
-              </article>
-              <article class="spec-card">
-                <span class="spec-icon"><i class="fa-solid fa-shirt" aria-hidden="true"></i></span>
-                <span class="spec-label">THE FINISH</span>
-                <strong>Garment washed</strong>
-                <span>Soft from the first wear</span>
-              </article>
-            </div>
-          </div>
-          <!-- MOLECULE: product metadata and dynamic shade selector -->
-          <div class="shirt-details">
-            <div class="product-meta">
-              <span class="product-category">AURA ESSENTIALS&nbsp; / &nbsp;01</span>
-              <span class="product-price">₹ 2,490</span>
-            </div>
-            <h3 class="product-title">The relaxed<br />cotton shirt</h3>
-            <p class="product-description">
-              A clean, easy silhouette with a soft structure. Cut from breathable Supima cotton to move naturally from slow mornings to late evenings.
-            </p>
-            <div class="detail-divider"></div>
-            <!-- MOLECULE: sizing badges and the size-guide action -->
-            <div class="size-row">
-              <span class="detail-label">SIZE</span>
-              <div class="size-badges" aria-label="Available sizes">
-                <span>XS</span><span>S</span><span class="size-selected">M</span><span>L</span><span>XL</span>
-              </div>
-              <button class="size-guide" type="button" id="size-guide">Size guide <span aria-hidden="true">↗</span></button>
-            </div>
-            <!-- MOLECULE: dynamic shade metadata and 16-button selector -->
-            <div class="color-heading">
-              <span class="detail-label">THE COLOUR STUDY</span>
-              <span class="color-count"><span id="selected-shade-label">Ink</span> <b>·</b> 16 shades</span>
-            </div>
-            <div class="swatch-grid" id="swatch-grid" role="group" aria-label="Choose a shirt shade"></div>
-            <a class="button button-outline" id="shirt-inquiry" href="#" target="_blank" rel="noreferrer">
-              <i class="fa-brands fa-whatsapp" aria-hidden="true"></i>
-              <span>Enquire about this shade</span>
-              <span class="button-arrow" aria-hidden="true">↗</span>
-            </a>
-            <p class="made-note"><i class="fa-solid fa-circle-check" aria-hidden="true"></i> Thoughtfully made in India</p>
-          </div>
-        </div>
-        <span class="slide-number">02 <i>—</i> 04</span>
-      </section>
+      <div id="product-slides"></div>
+      <div id="load-error" class="load-error" role="alert" hidden></div>
 
-      <!-- ORGANISM: chino feature spread -->
-      <section class="slide chino-slide" id="slide-3" aria-labelledby="chino-title">
-        <div class="chino-topline">
-          <div>
-            <span class="eyebrow"><span class="eyebrow-line"></span> 02 / THE CHINO</span>
-            <h2 class="section-title" id="chino-title">Ease, with <em>intention.</em></h2>
-          </div>
-          <p class="section-intro">Tailored where it matters.<br />Uncomplicated everywhere else.</p>
-        </div>
-        <!-- MOLECULE: three-angle product image spread -->
-        <div class="chino-gallery">
-          <figure class="chino-view chino-view-main">
-            <div class="chino-image-wrap">
-              <img
-                src="https://images.unsplash.com/photo-1624378439575-d8705ad7ae80?auto=format&fit=crop&w=1200&q=85"
-                alt="The AURA chino, front silhouette"
-                loading="lazy"
-              />
-              <span class="view-number">01</span>
-            </div>
-            <figcaption><span>THE SILHOUETTE</span><strong>Front / easy taper</strong></figcaption>
-          </figure>
-          <figure class="chino-view chino-view-rear">
-            <div class="chino-image-wrap">
-              <img
-                src="https://images.unsplash.com/photo-1473966968600-fa801b869a1a?auto=format&fit=crop&w=1000&q=85"
-                alt="Tailored details on the AURA chino"
-                loading="lazy"
-              />
-              <span class="view-number">02</span>
-            </div>
-            <figcaption><span>THE FINISH</span><strong>Rear / considered detail</strong></figcaption>
-          </figure>
-          <figure class="chino-view chino-view-texture">
-            <div class="chino-image-wrap">
-              <img
-                src="https://images.unsplash.com/photo-1551488831-00ddcb6c6bd3?auto=format&fit=crop&w=1000&q=85"
-                alt="Close detail of a woven cotton fabric"
-                loading="lazy"
-              />
-              <span class="view-number">03</span>
-            </div>
-            <figcaption><span>THE TEXTURE</span><strong>Micro-weave / stretch cotton</strong></figcaption>
-          </figure>
-        </div>
-        <div class="chino-bottom">
-          <div class="chino-specs">
-            <span class="detail-label">MADE TO MOVE</span>
-            <div class="chino-spec-list">
-              <span><b>01</b> 98% cotton / 2% elastane</span>
-              <span><b>02</b> 240 GSM midweight twill</span>
-              <span><b>03</b> Relaxed taper / mid rise</span>
-              <span><b>04</b> Reinforced stress points</span>
-            </div>
-          </div>
-          <div class="care-guide">
-            <span class="detail-label">A LITTLE CARE GOES A LONG WAY</span>
-            <div class="care-items">
-              <span><i class="fa-solid fa-temperature-half" aria-hidden="true"></i> Cold wash</span>
-              <span><i class="fa-solid fa-ban" aria-hidden="true"></i> No bleach</span>
-              <span><i class="fa-solid fa-wind" aria-hidden="true"></i> Line dry</span>
-              <span><i class="fa-solid fa-temperature-low" aria-hidden="true"></i> Low iron</span>
-            </div>
-          </div>
-        </div>
-        <span class="slide-number">03 <i>—</i> 04</span>
-      </section>
-
-      <!-- ORGANISM: contact and brand -->
-      <section class="slide contact-slide" id="slide-4" aria-labelledby="contact-title">
+      <section class="slide contact-slide" id="slide-contact" aria-labelledby="contact-title">
         <div class="contact-orbit orbit-one" aria-hidden="true"></div>
         <div class="contact-orbit orbit-two" aria-hidden="true"></div>
         <div class="contact-content">
@@ -292,7 +126,6 @@
             <span>Speak with our concierge</span>
             <span class="button-arrow" aria-hidden="true">↗</span>
           </a>
-          <!-- MOLECULE: showroom, hours, and direct-contact metadata -->
           <div class="contact-details">
             <article class="contact-block">
               <span class="contact-icon"><i class="fa-solid fa-location-dot" aria-hidden="true"></i></span>
@@ -322,10 +155,10 @@
           <span>QUIETLY CONSIDERED. ALWAYS.</span>
           <span>© AURA STUDIO 2025</span>
         </footer>
-        <span class="slide-number">04 <i>—</i> 04</span>
+        <span class="slide-number" id="contact-slide-number"></span>
       </section>
     </main>
     <div class="toast" id="toast" role="status" aria-live="polite"></div>
-    <script src="app.js"></script>
+    <script src="app.js?v=2"></script>
   </body>
 </html>

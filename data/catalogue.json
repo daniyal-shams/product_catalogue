@@ -1,0 +1,17 @@
+{
+  "shirt": [
+    "shirt/01.json",
+    "shirt/02.json",
+    "shirt/03.json"
+  ],
+  "pant": [
+    "pant/01.json",
+    "pant/02.json",
+    "pant/03.json",
+    "pant/04.json",
+    "pant/05.json",
+    "pant/06.json",
+    "pant/07.json",
+    "pant/08.json"
+  ]
+}

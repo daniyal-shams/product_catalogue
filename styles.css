@@ -1947,3 +1947,53 @@ body {
     font-size: 14px;
   }
 }
+
+.pant-frame {
+  height: clamp(380px, 58vh, 520px);
+}
+
+.pant-frame .shirt-image {
+  object-fit: contain;
+  object-position: center;
+}
+
+@media (max-width: 820px) {
+  .pant-frame {
+    height: clamp(350px, 50vh, 460px);
+    min-height: 350px;
+    max-height: none;
+  }
+}
+
+.variant-grid {
+  grid-template-columns: repeat(auto-fill, minmax(28px, 34px));
+  justify-content: start;
+  padding: 4px;
+}
+
+.variant-grid .swatch {
+  display: block;
+  min-width: 28px;
+}
+
+.product-image-contain {
+  object-fit: contain;
+  object-position: center;
+}
+
+.load-error {
+  position: fixed;
+  z-index: 40;
+  right: 20px;
+  bottom: 20px;
+  left: 20px;
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 16px 20px;
+  border: 1px solid #a34a3c;
+  background: #fff8f5;
+  color: #752f25;
+  font-size: 13px;
+  line-height: 1.6;
+  box-shadow: 0 10px 30px rgba(47, 43, 36, 0.14);
+}
