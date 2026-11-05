@@ -1,3 +1,4 @@
+const brandName = "Epic & Flair";
 const whatsappNumber = "919876543210";
 const catalogueUrl = new URL("data/catalogue.json", document.baseURI);
 const deck = document.querySelector("#deck");
@@ -157,7 +158,7 @@ function renderProductContent(product, categoryProducts, categoryIndex) {
         <div class="care-items">${product.care.map((item) => `<span>${escapeHtml(item)}</span>`).join("")}</div>
       </div>
     </div>` : "";
-  const enquiryMessage = `Hello AURA, I'm interested in the ${product.name} in ${product.color}. Could you share more details?`;
+  const enquiryMessage = `Hello ${brandName}, I'm interested in the ${product.name} in ${product.color}. Could you share more details?`;
 
   return `
         <div class="section-heading">
@@ -176,13 +177,13 @@ function renderProductContent(product, categoryProducts, categoryIndex) {
                 <span class="shade-dot" style="background-color: ${escapeHtml(product.colorHex)}"></span>
                 <span><small>SELECTED COLOUR</small><strong>${escapeHtml(product.color)}</strong></span>
               </div>
-              <span class="frame-caption">AURA / ${escapeHtml(product.name)} / SS25</span>
+              <span class="frame-caption">${brandName} / ${escapeHtml(product.name)} / SS25</span>
             </div>
             <div class="spec-row" aria-label="${escapeHtml(product.name)} specifications">${specs}</div>
         </div>
         <div class="shirt-details">
           <div class="product-meta">
-            <span class="product-category">AURA ESSENTIALS</span>
+            <span class="product-category">${brandName.toUpperCase()} ESSENTIALS</span>
             <span class="product-price">${escapeHtml(product.price)}</span>
           </div>
           <h3 class="product-title">${escapeHtml(product.name)}</h3>
@@ -325,7 +326,7 @@ async function initializeCatalogue() {
 
     slideSections.forEach((section) => slideObserver.observe(section));
   } catch (error) {
-    console.error("Could not initialize the AURA catalogue.", error);
+    console.error(`Could not initialize the ${brandName} catalogue.`, error);
     loadError.hidden = false;
     loadError.textContent = `The collection could not be loaded. Check the JSON files in the data folder and open this site through a local or hosted web server. ${error.message}`;
   }

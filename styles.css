@@ -3,12 +3,18 @@
   --ink: #0f0f12;
   --panel: #151519;
   --panel-soft: #1b1b1f;
-  --gold: #c5a059;
-  --gold-soft: rgba(197, 160, 89, 0.18);
+  --gold: #b75e00;
+  --gold-soft: rgba(183, 94, 0, 0.18);
   --muted: #89878a;
   --line: rgba(255, 255, 255, 0.12);
-  --serif: "Playfair Display", Georgia, serif;
+  --display: "aBeatByKai", sans-serif;
   --sans: "DM Sans", Arial, sans-serif;
+}
+
+@font-face {
+  font-family: "aBeatByKai";
+  src: url("images/Font/ABEATBYKAIREGULAR.OTF") format("opentype");
+  font-display: swap;
 }
 
 * {
@@ -65,19 +71,20 @@ button {
   gap: 13px;
 }
 
-.brand-name,
-.footer-brand {
-  font-family: var(--serif);
-  font-size: 27px;
-  letter-spacing: 0.22em;
+.brand-logo {
+  display: block;
+  width: 112px;
+  height: auto;
 }
 
-.edition-badge {
-  padding: 5px 7px;
-  border: 1px solid rgba(197, 160, 89, 0.45);
-  color: var(--gold);
-  font-size: 8px;
-  letter-spacing: 0.16em;
+.footer-brand {
+  line-height: 0;
+}
+
+.footer-logo {
+  display: block;
+  width: 72px;
+  height: auto;
 }
 
 .main-nav {
@@ -124,7 +131,7 @@ button {
   justify-self: end;
   gap: 9px;
   padding: 10px 15px;
-  border: 1px solid rgba(197, 160, 89, 0.48);
+  border: 1px solid rgba(183, 94, 0, 0.48);
   color: #e6d3ac;
   font-size: 11px;
   transition: background 180ms ease, color 180ms ease;
@@ -238,7 +245,7 @@ button {
 .section-title,
 .contact-title {
   margin: 24px 0 0;
-  font-family: var(--serif);
+  font-family: var(--display);
   font-size: clamp(45px, 6.2vw, 86px);
   font-weight: 400;
   letter-spacing: -0.045em;
@@ -361,7 +368,8 @@ button {
 .card-title {
   bottom: 26px;
   left: 20px;
-  font-family: var(--serif);
+  color: #fff;
+  font-family: var(--display);
   font-size: clamp(21px, 2.1vw, 30px);
   line-height: 1.1;
 }
@@ -601,7 +609,7 @@ button {
 
 .product-title {
   margin: 13px 0 8px;
-  font-family: var(--serif);
+  font-family: var(--display);
   font-size: clamp(27px, 3vw, 39px);
   font-weight: 400;
   letter-spacing: -0.03em;
@@ -738,7 +746,7 @@ button:focus-visible {
 
 .button-outline {
   margin-top: 17px;
-  border: 1px solid rgba(197, 160, 89, 0.53);
+  border: 1px solid rgba(183, 94, 0, 0.53);
   color: #e7dcc6;
 }
 
@@ -846,7 +854,7 @@ button:focus-visible {
   top: 13px;
   left: 14px;
   color: rgba(255, 255, 255, 0.8);
-  font-family: var(--serif);
+  font-family: var(--display);
   font-size: 17px;
 }
 
@@ -929,7 +937,7 @@ button:focus-visible {
   min-height: 720px;
   padding: 130px 8vw 95px;
   background:
-    radial-gradient(ellipse at 50% 42%, rgba(197, 160, 89, 0.105), transparent 50%),
+    radial-gradient(ellipse at 50% 42%, rgba(183, 94, 0, 0.105), transparent 50%),
     #101013;
 }
 
@@ -939,7 +947,7 @@ button:focus-visible {
   left: 50%;
   width: min(52vw, 660px);
   aspect-ratio: 1;
-  border: 1px solid rgba(197, 160, 89, 0.07);
+  border: 1px solid rgba(183, 94, 0, 0.07);
   border-radius: 50%;
   pointer-events: none;
   transform: translateX(-50%);
@@ -948,7 +956,7 @@ button:focus-visible {
 .orbit-two {
   top: 27%;
   width: min(43vw, 550px);
-  border-color: rgba(197, 160, 89, 0.055);
+  border-color: rgba(183, 94, 0, 0.055);
 }
 
 .contact-content {
@@ -1007,7 +1015,7 @@ button:focus-visible {
   align-items: flex-start;
   min-width: 0;
   padding-left: 20px;
-  border-left: 1px solid rgba(197, 160, 89, 0.4);
+  border-left: 1px solid rgba(183, 94, 0, 0.4);
 }
 
 .contact-icon {
@@ -1024,7 +1032,7 @@ button:focus-visible {
 
 .contact-block strong {
   margin-top: 8px;
-  font-family: var(--serif);
+  font-family: var(--display);
   font-size: 16px;
   font-weight: 400;
 }
@@ -1062,18 +1070,13 @@ button:focus-visible {
   letter-spacing: 0.14em;
 }
 
-.footer-brand {
-  color: #e9e3d8;
-  font-size: 14px;
-}
-
 .toast {
   position: fixed;
   z-index: 30;
   right: 24px;
   bottom: 24px;
   padding: 12px 16px;
-  border: 1px solid rgba(197, 160, 89, 0.5);
+  border: 1px solid rgba(183, 94, 0, 0.5);
   background: #19191d;
   color: #eee8dd;
   font-size: 11px;
@@ -1139,13 +1142,8 @@ button:focus-visible {
     padding: 0 20px;
   }
 
-  .brand-name {
-    font-size: 23px;
-  }
-
-  .edition-badge {
-    padding: 4px 5px;
-    font-size: 7px;
+  .brand-logo {
+    width: 88px;
   }
 
   .header-cta {
@@ -1537,8 +1535,8 @@ button:focus-visible {
     font-size: 6px;
   }
 
-  .footer-brand {
-    font-size: 12px;
+  .footer-logo {
+    width: 80px;
   }
 }
 
@@ -1582,8 +1580,8 @@ button:focus-visible {
   --ink: #f6f3ed;
   --panel: #fffdf8;
   --panel-soft: #eee9df;
-  --gold: #94733d;
-  --gold-soft: rgba(148, 115, 61, 0.14);
+  --gold: #b75e00;
+  --gold-soft: rgba(183, 94, 0, 0.14);
   --muted: #716d66;
   --line: rgba(47, 43, 36, 0.14);
 }
@@ -1602,15 +1600,9 @@ body {
   background: rgba(250, 248, 243, 0.9);
 }
 
-.brand-name,
-.footer-brand {
-  color: #302d27;
-}
-
-.edition-badge,
 .header-cta {
-  border-color: rgba(148, 115, 61, 0.5);
-  color: #765b30;
+  border-color: rgba(183, 94, 0, 0.5);
+  color: #8f4a00;
 }
 
 .nav-link {
@@ -1652,7 +1644,7 @@ body {
 .hero-slide {
   min-height: max(720px, calc(100svh + 8px));
   background:
-    radial-gradient(ellipse at 68% 46%, rgba(148, 115, 61, 0.12), transparent 49%),
+    radial-gradient(ellipse at 68% 46%, rgba(183, 94, 0, 0.12), transparent 49%),
     linear-gradient(118deg, #f8f6f0 6%, #f0ece3 54%, #f7f4ed 100%);
 }
 
@@ -1738,7 +1730,7 @@ body {
 }
 
 .button-outline {
-  border-color: rgba(148, 115, 61, 0.58);
+  border-color: rgba(183, 94, 0, 0.58);
   color: #5c4828;
 }
 
@@ -1758,7 +1750,7 @@ body {
 .chino-slide,
 .contact-slide {
   background:
-    radial-gradient(ellipse at 50% 42%, rgba(148, 115, 61, 0.09), transparent 50%),
+    radial-gradient(ellipse at 50% 42%, rgba(183, 94, 0, 0.09), transparent 50%),
     #f8f6f0;
 }
 
@@ -1789,7 +1781,7 @@ body {
 }
 
 .contact-block {
-  border-left-color: rgba(148, 115, 61, 0.52);
+  border-left-color: rgba(183, 94, 0, 0.52);
 }
 
 .contact-label,
@@ -1810,7 +1802,7 @@ body {
 }
 
 .toast {
-  border-color: rgba(148, 115, 61, 0.55);
+  border-color: rgba(183, 94, 0, 0.55);
   background: #fffdf8;
   color: #302d27;
   box-shadow: 0 10px 30px rgba(47, 43, 36, 0.12);
@@ -1908,16 +1900,8 @@ body {
     padding-left: 15px;
   }
 
-  .brand-lockup {
-    gap: 7px;
-  }
-
-  .brand-name {
-    font-size: 21px;
-  }
-
-  .edition-badge {
-    font-size: 6px;
+  .brand-logo {
+    width: 78px;
   }
 
   .hero-title {
