@@ -1,9 +1,4 @@
 {
-  "shirt": [
-    "shirt/01.json",
-    "shirt/02.json",
-    "shirt/03.json"
-  ],
   "pant": [
     "pant/01.json",
     "pant/02.json",

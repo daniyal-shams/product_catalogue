@@ -1,0 +1,6 @@
+{
+  "enabled": true,
+  "pixelId": "",
+  "requireConsent": true,
+  "events": ["PageView", "ViewContent", "Contact", "Lead"]
+}

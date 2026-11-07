@@ -1,14 +1,163 @@
 const brandName = "Epic & Flair";
 const whatsappNumber = "919876543210";
 const catalogueUrl = new URL("data/catalogue.json", document.baseURI);
+const metaAdsConfigUrl = new URL("data/meta-ads.json", document.baseURI);
 const deck = document.querySelector("#deck");
 const productSlides = document.querySelector("#product-slides");
 const loadError = document.querySelector("#load-error");
 const toast = document.querySelector("#toast");
 const menuToggle = document.querySelector("#menu-toggle");
 const mainNav = document.querySelector(".main-nav");
-const indicators = document.querySelector("#slide-indicators");
+const consentPanel = document.querySelector("#consent-panel");
+const privacySettings = document.querySelector("#privacy-settings");
 let toastTimeout;
+let metaAdsConfig;
+let metaConsent = null;
+let metaPixelInitialized = false;
+let pantViewed = false;
+
+const supportedMetaEvents = new Set(["PageView", "ViewContent", "Contact", "Lead"]);
+
+function validateMetaAdsConfig(config, url) {
+  if (!config || typeof config !== "object" || Array.isArray(config)) {
+    throw new Error(`${url.pathname} must contain a JSON object.`);
+  }
+
+  if (typeof config.enabled !== "boolean" || typeof config.pixelId !== "string") {
+    throw new Error(`${url.pathname} must include enabled and pixelId values.`);
+  }
+
+  if (config.pixelId && !/^\d{5,20}$/.test(config.pixelId)) {
+    throw new Error(`${url.pathname} pixelId must be a numeric Meta Pixel ID.`);
+  }
+
+  if (typeof config.requireConsent !== "boolean") {
+    throw new Error(`${url.pathname} requireConsent must be a boolean.`);
+  }
+
+  if (!Array.isArray(config.events) || !config.events.every(
+    (event) => typeof event === "string" && supportedMetaEvents.has(event),
+  )) {
+    throw new Error(`${url.pathname} events must contain supported Meta standard event names.`);
+  }
+
+  return config;
+}
+
+function trackMetaEvent(eventName, parameters) {
+  if (
+    !metaAdsConfig?.enabled
+    || metaConsent !== "accepted"
+    || !metaAdsConfig.events.includes(eventName)
+    || typeof window.fbq !== "function"
+  ) {
+    return;
+  }
+
+  if (parameters) window.fbq("track", eventName, parameters);
+  else window.fbq("track", eventName);
+}
+
+function markPantViewed() {
+  if (pantViewed) return;
+
+  pantViewed = true;
+  trackMetaEvent("ViewContent", { content_category: "Pants" });
+}
+
+function initializeMetaPixel() {
+  if (metaConsent !== "accepted" || !metaAdsConfig?.enabled || !metaAdsConfig.pixelId) return;
+
+  if (typeof window.fbq !== "function") {
+    const fbq = function (...args) {
+      if (fbq.callMethod) fbq.callMethod.apply(fbq, args);
+      else fbq.queue.push(args);
+    };
+    fbq.push = fbq;
+    fbq.loaded = true;
+    fbq.version = "2.0";
+    fbq.queue = [];
+    window.fbq = fbq;
+    window._fbq = fbq;
+
+    const script = document.createElement("script");
+    script.async = true;
+    script.src = "https://connect.facebook.net/en_US/fbevents.js";
+    script.onerror = () => console.error("Could not load the Meta Pixel library.");
+    document.head.appendChild(script);
+  }
+
+  window.fbq("consent", "grant");
+  if (!metaPixelInitialized) {
+    window.fbq("init", metaAdsConfig.pixelId);
+    metaPixelInitialized = true;
+  }
+
+  trackMetaEvent("PageView");
+  if (pantViewed) trackMetaEvent("ViewContent", { content_category: "Pants" });
+}
+
+function saveMetaConsent(choice) {
+  metaConsent = choice;
+  try {
+    localStorage.setItem("metaAdsConsent", choice);
+  } catch (error) {
+    console.error("Could not save Meta advertising consent in this browser.", error);
+  }
+
+  if (choice === "accepted") {
+    initializeMetaPixel();
+  } else if (metaPixelInitialized && typeof window.fbq === "function") {
+    window.fbq("consent", "revoke");
+  }
+
+  consentPanel.hidden = true;
+}
+
+async function initializeMetaAds() {
+  try {
+    metaAdsConfig = validateMetaAdsConfig(
+      await loadJson(metaAdsConfigUrl),
+      metaAdsConfigUrl,
+    );
+    if (!metaAdsConfig.enabled) return;
+    if (!metaAdsConfig.pixelId) {
+      console.info("Meta Pixel is inactive until a Pixel ID is set in data/meta-ads.json.");
+      return;
+    }
+
+    privacySettings.hidden = false;
+    privacySettings.addEventListener("click", () => {
+      consentPanel.hidden = false;
+    });
+    document.querySelector("#consent-accept").addEventListener("click", () => {
+      saveMetaConsent("accepted");
+    });
+    document.querySelector("#consent-reject").addEventListener("click", () => {
+      saveMetaConsent("rejected");
+    });
+
+    try {
+      const savedConsent = localStorage.getItem("metaAdsConsent");
+      if (savedConsent === "accepted" || savedConsent === "rejected") {
+        metaConsent = savedConsent;
+      }
+    } catch (error) {
+      console.error("Could not read Meta advertising consent from this browser.", error);
+    }
+
+    if (!metaAdsConfig.requireConsent) {
+      metaConsent = "accepted";
+      initializeMetaPixel();
+    } else if (metaConsent === "accepted") {
+      initializeMetaPixel();
+    } else if (metaConsent !== "rejected") {
+      consentPanel.hidden = false;
+    }
+  } catch (error) {
+    console.error("Could not initialize Meta Ads tracking.", error);
+  }
+}
 
 function escapeHtml(value) {
   return String(value).replace(/[&<>"']/g, (character) => ({
@@ -132,8 +281,6 @@ function renderVariantButtons(products, currentIndex, category) {
 }
 
 function renderProductContent(product, categoryProducts, categoryIndex) {
-  const categoryLabel = product.category === "shirt" ? "THE SHIRT" : "THE PANT";
-  const categoryIndexLabel = `${String(categoryIndex + 1).padStart(2, "0")} / ${String(categoryProducts.length).padStart(2, "0")}`;
   const imageFitClass = product.imageFit === "contain" ? " product-image-contain" : "";
   const imageFilter = product.imageFilter ? ` style="filter: ${escapeHtml(product.imageFilter)}"` : "";
   const specs = product.specs.map((spec) => `
@@ -145,58 +292,54 @@ function renderProductContent(product, categoryProducts, categoryIndex) {
     </article>`).join("");
   const sizes = product.sizes.map((size) => `
     <span${size === product.selectedSize ? ' class="size-selected"' : ""}>${escapeHtml(size)}</span>`).join("");
-  const pantDetails = product.category === "pant" ? `
+  const pantDetails = `
     <div class="chino-bottom product-pant-bottom">
       <div class="chino-specs">
-        <span class="detail-label">MADE TO MOVE</span>
+        <span class="detail-label">DETAILS</span>
         <div class="chino-spec-list">
-          ${product.details.map((detail, index) => `<span><b>${String(index + 1).padStart(2, "0")}</b> ${escapeHtml(detail)}</span>`).join("")}
+          ${product.details.map((detail) => `<span>${escapeHtml(detail)}</span>`).join("")}
         </div>
       </div>
       <div class="care-guide">
-        <span class="detail-label">A LITTLE CARE GOES A LONG WAY</span>
+        <span class="detail-label">CARE</span>
         <div class="care-items">${product.care.map((item) => `<span>${escapeHtml(item)}</span>`).join("")}</div>
       </div>
-    </div>` : "";
+    </div>`;
   const enquiryMessage = `Hello ${brandName}, I'm interested in the ${product.name} in ${product.color}. Could you share more details?`;
 
   return `
         <div class="section-heading">
           <div>
-            <span class="eyebrow"><span class="eyebrow-line"></span> ${categoryIndexLabel} / ${categoryLabel}</span>
             <h2 class="section-title" id="${product.category}-title">${escapeHtml(product.headingLead)} <em>${escapeHtml(product.headingAccent)}</em></h2>
           </div>
           <p class="section-intro">${escapeHtml(product.intro)}</p>
         </div>
-        <div class="shirt-layout">
-          <div class="shirt-visual">
-            <div class="image-frame shirt-frame${product.category === "pant" ? " pant-frame" : ""}">
-              <img class="shirt-image shirt-image-front${imageFitClass}" src="${escapeHtml(product.imageUrl)}" alt="${escapeHtml(product.imageAlt)}"${imageFilter} loading="lazy" />
+        <div class="product-layout">
+          <div class="product-visual">
+            <div class="image-frame product-frame pant-frame">
+              <img class="product-image${imageFitClass}" src="${escapeHtml(product.imageUrl)}" alt="${escapeHtml(product.imageAlt)}"${imageFilter} loading="lazy" />
               <div class="image-vignette" aria-hidden="true"></div>
               <div class="shade-tag">
                 <span class="shade-dot" style="background-color: ${escapeHtml(product.colorHex)}"></span>
                 <span><small>SELECTED COLOUR</small><strong>${escapeHtml(product.color)}</strong></span>
               </div>
-              <span class="frame-caption">${brandName} / ${escapeHtml(product.name)} / SS25</span>
             </div>
             <div class="spec-row" aria-label="${escapeHtml(product.name)} specifications">${specs}</div>
         </div>
-        <div class="shirt-details">
+        <div class="product-details">
           <div class="product-meta">
-            <span class="product-category">${brandName.toUpperCase()} ESSENTIALS</span>
             <span class="product-price">${escapeHtml(product.price)}</span>
           </div>
           <h3 class="product-title">${escapeHtml(product.name)}</h3>
           <p class="product-description">${escapeHtml(product.description)}</p>
           <div class="detail-divider"></div>
           <div class="size-row">
-            <span class="detail-label">${product.category === "pant" ? "WAIST" : "SIZE"}</span>
+            <span class="detail-label">WAIST</span>
             <div class="size-badges" aria-label="Available sizes">${sizes}</div>
             <button class="size-guide" type="button">Size guide <span aria-hidden="true">↗</span></button>
           </div>
           <div class="color-heading">
-            <span class="detail-label">THE COLOUR STUDY</span>
-            <span class="color-count">${escapeHtml(product.color)} <b>·</b> ${categoryIndex + 1} of ${categoryProducts.length}</span>
+            <span class="detail-label">AVAILABLE COLOURS</span>
           </div>
           <div class="swatch-grid variant-grid" role="group" aria-label="Choose a ${product.category} colour">${renderVariantButtons(categoryProducts, categoryIndex, product.category)}</div>
           <a class="button button-outline" href="https://wa.me/${whatsappNumber}?text=${encodeURIComponent(enquiryMessage)}" target="_blank" rel="noreferrer">
@@ -211,41 +354,22 @@ function renderProductContent(product, categoryProducts, categoryIndex) {
     `;
 }
 
-function renderProductSlide(product, categoryProducts, slideIndex, slideCount) {
+function renderProductSlide(product, categoryProducts, slideIndex) {
   const categoryHeadingId = `${product.category}-title`;
   return `
-    <section class="slide shirt-slide product-slide ${product.category}-product-slide" id="slide-${slideIndex}" data-category="${product.category}" aria-labelledby="${categoryHeadingId}">
+    <section class="slide chino-slide product-slide pant-product-slide" id="slide-${slideIndex}" data-category="${product.category}" aria-labelledby="${categoryHeadingId}">
       <div class="product-content">${renderProductContent(product, categoryProducts, 0)}</div>
-      <span class="slide-number">${String(slideIndex).padStart(2, "0")} <i>—</i> ${String(slideCount).padStart(2, "0")}</span>
     </section>`;
 }
 
-function createIndicators(slideLabels) {
-  indicators.innerHTML = slideLabels.map((label, index) => `
-    <a
-      href="#slide-${index + 1}"
-      class="indicator${index === 0 ? " active" : ""}"
-      aria-label="Go to ${escapeHtml(label)}"
-      ${index === 0 ? 'aria-current="page"' : ""}
-    ></a>`).join("");
-}
-
-function updateNavigation(contactSlideId, slideLabels) {
-  document.querySelector('[data-nav="shirt"]').href = "#slide-2";
-  document.querySelector('[data-nav="pant"]').href = "#slide-3";
+function updateNavigation(contactSlideId) {
+  document.querySelector('[data-nav="pant"]').href = "#slide-2";
   document.querySelector('[data-nav="visit"]').href = `#${contactSlideId}`;
-
-  document.querySelector("#hero-side-note").textContent =
-    `A STUDY IN SIMPLICITY · 01—${String(slideLabels.length).padStart(2, "0")}`;
-  document.querySelector(".hero-card.shirt-card").href = "#slide-2";
-  document.querySelector(".hero-card.chino-card").href = "#slide-3";
-  document.querySelector(".scroll-cue").href = "#slide-2";
-  document.querySelector("#contact-slide-number").innerHTML =
-    `${String(slideLabels.length).padStart(2, "0")} <i>—</i> ${String(slideLabels.length).padStart(2, "0")}`;
+  document.querySelector(".hero-card.chino-card").href = "#slide-2";
   document.querySelector("#slide-contact").id = contactSlideId;
 }
 
-function activateSlide(section, navigationLinks, indicatorLinks) {
+function activateSlide(section, navigationLinks) {
   navigationLinks.forEach((link) => {
     const target = link.dataset.nav;
     const isActive = target === "home"
@@ -256,12 +380,6 @@ function activateSlide(section, navigationLinks, indicatorLinks) {
     link.classList.toggle("active", isActive);
   });
 
-  indicatorLinks.forEach((link) => {
-    const isActive = link.getAttribute("href") === `#${section.id}`;
-    link.classList.toggle("active", isActive);
-    if (isActive) link.setAttribute("aria-current", "page");
-    else link.removeAttribute("aria-current");
-  });
 }
 
 async function initializeCatalogue() {
@@ -271,31 +389,19 @@ async function initializeCatalogue() {
       throw new Error("data/catalogue.json must contain a JSON object.");
     }
 
-    const [shirts, pants] = await Promise.all([
-      loadCategoryProducts(manifest.shirt, "shirt", catalogueUrl),
-      loadCategoryProducts(manifest.pant, "pant", catalogueUrl),
-    ]);
+    const pants = await loadCategoryProducts(manifest.pant, "pant", catalogueUrl);
 
-    const totalSlides = 4;
-    const categoryProducts = { shirt: shirts, pant: pants };
+    const categoryProducts = { pant: pants };
     const productSlidesData = [
-      { product: shirts[0], variants: shirts, slideIndex: 2 },
-      { product: pants[0], variants: pants, slideIndex: 3 },
+      { product: pants[0], variants: pants },
     ];
 
     productSlides.innerHTML = productSlidesData.map((item) =>
-      renderProductSlide(item.product, item.variants, item.slideIndex, totalSlides),
+      renderProductSlide(item.product, item.variants, 2),
     ).join("");
 
-    const contactSlideId = `slide-${totalSlides}`;
-    const slideLabels = [
-      "The edit",
-      "The shirt",
-      "The pant",
-      "Visit us",
-    ];
-    updateNavigation(contactSlideId, slideLabels);
-    createIndicators(slideLabels);
+    updateNavigation("slide-3");
+    if (location.hash === "#slide-2") markPantViewed();
 
     productSlides.addEventListener("click", (event) => {
       const variantButton = event.target.closest("button[data-variant-index]");
@@ -312,14 +418,16 @@ async function initializeCatalogue() {
     });
 
     const navigationLinks = [...mainNav.querySelectorAll(".nav-link")];
-    const indicatorLinks = [...indicators.querySelectorAll(".indicator")];
     const slideSections = [...deck.querySelectorAll(".slide")];
     const slideObserver = new IntersectionObserver(
       (entries) => {
         const visibleEntry = entries
           .filter((entry) => entry.isIntersecting)
           .sort((left, right) => right.intersectionRatio - left.intersectionRatio)[0];
-        if (visibleEntry) activateSlide(visibleEntry.target, navigationLinks, indicatorLinks);
+        if (visibleEntry) {
+          activateSlide(visibleEntry.target, navigationLinks);
+          if (visibleEntry.target.dataset.category === "pant") markPantViewed();
+        }
       },
       { root: deck, threshold: [0.2, 0.45, 0.65] },
     );
@@ -339,6 +447,17 @@ mainNav.addEventListener("click", (event) => {
   menuToggle.setAttribute("aria-label", "Open navigation");
 });
 
+document.addEventListener("click", (event) => {
+  const link = event.target.closest("a");
+  if (!link) return;
+
+  if (link.getAttribute("href") === "#slide-2") markPantViewed();
+  if (link.href.startsWith("https://wa.me/")) {
+    trackMetaEvent("Contact", { content_name: "WhatsApp enquiry" });
+    trackMetaEvent("Lead", { content_name: "WhatsApp enquiry" });
+  }
+});
+
 menuToggle.addEventListener("click", () => {
   const isExpanded = menuToggle.getAttribute("aria-expanded") === "true";
   menuToggle.setAttribute("aria-expanded", String(!isExpanded));
@@ -350,13 +469,11 @@ productSlides.addEventListener("click", (event) => {
   const button = event.target.closest(".size-guide");
   if (!button) return;
 
-  const isPant = button.closest(".product-slide").dataset.category === "pant";
-  toast.textContent = isPant
-    ? "Our chinos have a mid-rise fit. Choose your usual waist size for a relaxed fit."
-    : "Our relaxed fit runs true to size. For a closer fit, choose one size down.";
+  toast.textContent = "Our chinos have a mid-rise fit. Choose your usual waist size for a relaxed fit.";
   toast.classList.add("visible");
   window.clearTimeout(toastTimeout);
   toastTimeout = window.setTimeout(() => toast.classList.remove("visible"), 3500);
 });
 
+initializeMetaAds();
 initializeCatalogue();
