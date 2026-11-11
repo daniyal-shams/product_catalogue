@@ -10,7 +10,6 @@ const menuToggle = document.querySelector("#menu-toggle");
 const mainNav = document.querySelector(".main-nav");
 const consentPanel = document.querySelector("#consent-panel");
 const privacySettings = document.querySelector("#privacy-settings");
-let toastTimeout;
 let metaAdsConfig;
 let metaConsent = null;
 let metaPixelInitialized = false;
@@ -181,11 +180,8 @@ function validateProduct(product, url, category) {
   const requiredText = [
     "name",
     "color",
-    "colorHex",
     "headingLead",
     "headingAccent",
-    "intro",
-    "price",
     "description",
     "image",
     "imageAlt",
@@ -200,10 +196,6 @@ function validateProduct(product, url, category) {
     if (typeof product[key] !== "string" || product[key].trim() === "") {
       throw new Error(`${url.pathname} is missing the required "${key}" text.`);
     }
-  }
-
-  if (!/^#[\da-f]{6}$/i.test(product.colorHex)) {
-    throw new Error(`${url.pathname} has an invalid colorHex value.`);
   }
 
   if (!Array.isArray(product.sizes) || product.sizes.length === 0 || !product.sizes.every((size) => typeof size === "string")) {
@@ -225,7 +217,7 @@ function validateProduct(product, url, category) {
   }
 
   if (category === "pant") {
-    for (const key of ["details", "care"]) {
+    for (const key of ["details", "orderDetails"]) {
       if (!Array.isArray(product[key]) || product[key].length === 0 || !product[key].every((item) => typeof item === "string")) {
         throw new Error(`${url.pathname} must contain a non-empty ${key} array of strings.`);
       }
@@ -269,14 +261,12 @@ function renderVariantButtons(products, currentIndex, category) {
     const isCurrent = index === currentIndex;
     return `
       <button
-        class="swatch${isCurrent ? " active" : ""}"
+        class="variant-option${isCurrent ? " active" : ""}"
         type="button"
         data-variant-index="${index}"
-        style="background-color: ${escapeHtml(product.colorHex)}"
         aria-label="${escapeHtml(product.color)} ${escapeHtml(product.name)}"
         aria-pressed="${isCurrent}"
-        title="${escapeHtml(product.color)}"
-      ></button>`;
+      >${escapeHtml(product.color)}</button>`;
   }).join("");
 }
 
@@ -301,8 +291,8 @@ function renderProductContent(product, categoryProducts, categoryIndex) {
         </div>
       </div>
       <div class="care-guide">
-        <span class="detail-label">CARE</span>
-        <div class="care-items">${product.care.map((item) => `<span>${escapeHtml(item)}</span>`).join("")}</div>
+        <span class="detail-label">ORDER INFORMATION</span>
+        <div class="care-items">${product.orderDetails.map((item) => `<span>${escapeHtml(item)}</span>`).join("")}</div>
       </div>
     </div>`;
   const enquiryMessage = `Hello ${brandName}, I'm interested in the ${product.name} in ${product.color}. Could you share more details?`;
@@ -312,7 +302,7 @@ function renderProductContent(product, categoryProducts, categoryIndex) {
           <div>
             <h2 class="section-title" id="${product.category}-title">${escapeHtml(product.headingLead)} <em>${escapeHtml(product.headingAccent)}</em></h2>
           </div>
-          <p class="section-intro">${escapeHtml(product.intro)}</p>
+          ${product.intro ? `<p class="section-intro">${escapeHtml(product.intro)}</p>` : ""}
         </div>
         <div class="product-layout">
           <div class="product-visual">
@@ -320,7 +310,6 @@ function renderProductContent(product, categoryProducts, categoryIndex) {
               <img class="product-image${imageFitClass}" src="${escapeHtml(product.imageUrl)}" alt="${escapeHtml(product.imageAlt)}"${imageFilter} loading="lazy" />
               <div class="image-vignette" aria-hidden="true"></div>
               <div class="shade-tag">
-                <span class="shade-dot" style="background-color: ${escapeHtml(product.colorHex)}"></span>
                 <span><small>SELECTED COLOUR</small><strong>${escapeHtml(product.color)}</strong></span>
               </div>
             </div>
@@ -328,7 +317,7 @@ function renderProductContent(product, categoryProducts, categoryIndex) {
         </div>
         <div class="product-details">
           <div class="product-meta">
-            <span class="product-price">${escapeHtml(product.price)}</span>
+            <span class="product-price">Request a quote</span>
           </div>
           <h3 class="product-title">${escapeHtml(product.name)}</h3>
           <p class="product-description">${escapeHtml(product.description)}</p>
@@ -339,9 +328,10 @@ function renderProductContent(product, categoryProducts, categoryIndex) {
             <button class="size-guide" type="button">Size guide <span aria-hidden="true">↗</span></button>
           </div>
           <div class="color-heading">
-            <span class="detail-label">AVAILABLE COLOURS</span>
+            <span class="detail-label">15–20 COLOUR OPTIONS</span>
           </div>
-          <div class="swatch-grid variant-grid" role="group" aria-label="Choose a ${product.category} colour">${renderVariantButtons(categoryProducts, categoryIndex, product.category)}</div>
+          <div class="variant-options" role="group" aria-label="Choose a ${product.category} colour">${renderVariantButtons(categoryProducts, categoryIndex, product.category)}</div>
+          <p class="color-note">Displayed colours are a selection; ask us for the full range.</p>
           <a class="button button-outline" href="https://wa.me/${whatsappNumber}?text=${encodeURIComponent(enquiryMessage)}" target="_blank" rel="noreferrer">
             <i class="fa-brands fa-whatsapp" aria-hidden="true"></i>
             <span>Enquire about this colour</span>
@@ -469,10 +459,13 @@ productSlides.addEventListener("click", (event) => {
   const button = event.target.closest(".size-guide");
   if (!button) return;
 
-  toast.textContent = "Our chinos have a mid-rise fit. Choose your usual waist size for a relaxed fit.";
-  toast.classList.add("visible");
-  window.clearTimeout(toastTimeout);
-  toastTimeout = window.setTimeout(() => toast.classList.remove("visible"), 3500);
+  document.querySelector("#size-chart").showModal();
+});
+
+document.querySelector("#size-chart").addEventListener("click", (event) => {
+  if (event.target.closest("[data-close-size-chart]") || event.target === event.currentTarget) {
+    event.currentTarget.close();
+  }
 });
 
 initializeMetaAds();

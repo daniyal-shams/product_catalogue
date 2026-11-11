@@ -7,7 +7,7 @@
       name="description"
       content="Epic &amp; Flair — considered everyday essentials, made to be lived in."
     />
-    <meta name="theme-color" content="#f6f3ed" />
+    <meta name="theme-color" content="#ffffff" />
     <title>Epic &amp; Flair — The Essential Edit</title>
     <link rel="icon" href="images/Favicon/Favicon.ico" sizes="any" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -26,7 +26,13 @@
           theme: {
             extend: {
               colors: {
-                brand: { 900: "#f6f3ed", 800: "#eee9df", gold: "#b75e00" },
+                brand: {
+                  900: "#ffffff",
+                  800: "#faf7f2",
+                  charcoal: "#2b2b2b",
+                  gray: "#e6e3de",
+                  gold: "#fd9929",
+                },
               },
               fontFamily: {
                 sans: ['"DM Sans"', "sans-serif"],
@@ -152,6 +158,39 @@
       </section>
     </main>
     <div class="toast" id="toast" role="status" aria-live="polite"></div>
+    <dialog class="size-chart-dialog" id="size-chart" aria-labelledby="size-chart-title">
+      <div class="size-chart-header">
+        <div>
+          <span class="detail-label">COTTON LYCRA COMFORT FIT PANTS</span>
+          <h2 id="size-chart-title">Waist size chart</h2>
+        </div>
+        <button class="size-chart-close" type="button" aria-label="Close size chart" data-close-size-chart>
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="size-chart-table-wrap">
+        <table class="size-chart-table">
+          <thead>
+            <tr>
+              <th scope="col">Size</th>
+              <th scope="col">Waist (inches)</th>
+              <th scope="col">Waist (cm)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><th scope="row">28</th><td>28</td><td>71</td></tr>
+            <tr><th scope="row">30</th><td>30</td><td>76</td></tr>
+            <tr><th scope="row">32</th><td>32</td><td>81</td></tr>
+            <tr><th scope="row">34</th><td>34</td><td>86</td></tr>
+            <tr><th scope="row">36</th><td>36</td><td>91</td></tr>
+            <tr><th scope="row">38</th><td>38</td><td>97</td></tr>
+            <tr><th scope="row">40</th><td>40</td><td>102</td></tr>
+            <tr><th scope="row">42</th><td>42</td><td>107</td></tr>
+            <tr><th scope="row">44</th><td>44</td><td>112</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </dialog>
     <section
       class="consent-panel"
       id="consent-panel"

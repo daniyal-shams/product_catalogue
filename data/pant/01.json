@@ -1,22 +1,19 @@
 {
-  "name": "Essential Cotton Chino",
+  "name": "Cotton Lycra Comfort Fit Pants",
   "color": "Navy",
-  "colorHex": "#30384d",
-  "headingLead": "Ease,",
-  "headingAccent": "with intention.",
-  "intro": "Tailored where it matters. Uncomplicated everywhere else.",
-  "price": "₹ 3,290",
-  "description": "An easy mid-rise and a clean, tapered leg. Cut from soft stretch cotton that keeps its shape and moves with you, wherever the day leads.",
-  "image": "../../images/catalog/88.png",
+  "headingLead": "Comfort for",
+  "headingAccent": "everyday wear.",
+  "description": "Comfort fit cotton stretch pants in 15–20 colour options and waist sizes 28–44. Individually polybag packed. Minimum order quantity: 500 pieces.",
+  "image": "../new%20pant%20img/8af84628-d780-4aae-8aa6-b534090501ce.png",
   "imageAlt": "Epic & Flair cotton chino in Navy",
   "imageFit": "contain",
-  "sizes": ["28", "30", "32", "34", "36"],
+  "sizes": ["28", "30", "32", "34", "36", "38", "40", "42", "44"],
   "selectedSize": "32",
-  "details": ["98% cotton / 2% elastane", "240 GSM midweight twill", "Relaxed taper / mid rise", "Reinforced stress points"],
-  "care": ["Cold wash", "No bleach", "Line dry", "Low iron"],
+  "details": ["Cotton Lycra stretch fabric", "Comfort fit", "Waist sizes: 28–44", "Job work at partner factories in South India"],
+  "orderDetails": ["MOQ: 500 pieces", "Individual polybag packing", "Made to order", "15–20 colour options"],
   "specs": [
-    { "icon": "fa-leaf", "label": "THE FABRIC", "value": "Stretch cotton", "note": "Soft, breathable twill" },
-    { "icon": "fa-weight-hanging", "label": "THE WEIGHT", "value": "240 GSM", "note": "Made for every season" },
-    { "icon": "fa-person-walking", "label": "THE FIT", "value": "Relaxed taper", "note": "Easy through the day" }
+    { "icon": "fa-leaf", "label": "THE FABRIC", "value": "Cotton Lycra", "note": "Stretch casual pants" },
+    { "icon": "fa-box", "label": "MINIMUM ORDER", "value": "500 pieces", "note": "Individual polybag packing" },
+    { "icon": "fa-person-walking", "label": "THE FIT", "value": "Comfort fit", "note": "Waist sizes 28–44" }
   ]
 }
